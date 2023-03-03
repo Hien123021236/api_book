@@ -1,0 +1,55 @@
+{
+  "apps" : [{
+    "name"      : "ima",
+    "script"    : "./server.js",
+    "instances" : 1,
+    "exec_mode" : "cluster",
+    "watch"     : false,
+    "ignore_watch" : ["node_modules", "public", "logs", "migrations", "tmp", "storage"],
+    "kill_timeout" : 3000,
+    "wait_ready": true,
+    "listen_timeout" : 3000,
+    "env_development": {
+      "NODE_ENV": "development",
+      "NODE_PORT": 7500,
+      "API_ROOT_URL": "http://localhost:7500",
+      "WEB_ROOT_URL": "",
+      "STORAGE_ROOT_URL": "",
+      "DB_HOST": "127.0.0.1",
+      "DB_PORT": "3306",
+      "DB_DATABASE": "dbtest",
+      "DB_SCHEMA": "",
+      "DB_USERNAME": "root",
+      "DB_PASSWORD": "123456",
+      "DB_DIALECT": "mysql"
+    },
+    "env_production" : {
+      "NODE_ENV": "production",
+      "NODE_PORT": 7500,
+      "API_ROOT_URL": "htts://103.153.68.130",
+      "WEB_ROOT_URL": "",
+      "STORAGE_ROOT_URL": "",
+      "DB_HOST": "http://103.153.68.130",
+      "DB_PORT": "5432",
+      "DB_DATABASE": "database",
+      "DB_SCHEMA": "archive",
+      "DB_USERNAME": "archive",
+      "DB_PASSWORD": "archive",
+      "DB_DIALECT": "postgres"
+    },
+    "env_localhost" : {
+      "NODE_ENV": "localhost",
+      "NODE_PORT": 7500,
+      "API_ROOT_URL": "http://localhost:7500",
+      "WEB_ROOT_URL": "",
+      "STORAGE_ROOT_URL": "",
+      "DB_HOST": "localhost",
+      "DB_PORT": "5432",
+      "DB_DATABASE": "database",
+      "DB_SCHEMA": "archive",
+      "DB_USERNAME": "archive",
+      "DB_PASSWORD": "archive",
+      "DB_DIALECT": "postgres"
+    }
+  }]
+}

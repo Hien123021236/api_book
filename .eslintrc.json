@@ -1,0 +1,21 @@
+{
+    "env": {
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": ["google"],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 11
+    },
+    "rules": {
+        "max-len": [2, { "code": 1000, "tabWidth": 8, "ignoreUrls": true }],
+        "linebreak-style": "off",
+        "new-cap": "off",
+        "require-jsdoc": "off"
+    }
+}
