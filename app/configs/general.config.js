@@ -21,6 +21,7 @@ module.exports = {
   jwtAuthKey: 'fdhjfdfuejfkjdhfaueyruesfhjs',
   internalServerKey: 'fdhjfdfuejfkjiuhhhgtwckkusfhjs',
   sockIOAuthKey: 'fhskjfenfnhpploemjase',
+  sendGridApiKey: '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',
   paths: {
     public: '/public',
     tmp: '/tmp',

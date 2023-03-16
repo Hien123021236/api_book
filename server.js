@@ -75,9 +75,8 @@ const httpServer = require('http').createServer(app);
 // Models
 require('./app/models/index'); // initialize models
 
-// // Jobs
-// require('./app/jobs/index') // initialize jobs
-
+// Jobs
+require('./app/jobs/scheduler'); // initialize jobs
 
 process.on('SIGINT', function() {
   // Stops the server from accepting new connections and finishes existing connections.

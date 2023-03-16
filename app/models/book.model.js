@@ -13,6 +13,14 @@ module.exports = (database, DataTypes) => {
         through: models.CategoryBook,
         as: 'categories',
       });
+      models.Book.hasMany(models.Wish, {
+        foreignKey: 'bookId',
+        as: 'wishes',
+      });
+      models.Book.hasMany(models.Comment, {
+        foreignKey: 'bookId',
+        as: 'comments',
+      });
     }
 
     // allow attributes for search
@@ -22,7 +30,24 @@ module.exports = (database, DataTypes) => {
 
     // allow attributes for sort
     static getAttributesForSort() {
-      return ['name', 'isbn', 'authors', 'publishedDay', 'activated', 'createdAt'];
+      return [
+        'name',
+        'isbn',
+        'authors',
+        'publishedDay',
+        'activated',
+        'createdAt',
+        function rate(query, order) {
+          if (!query.order) {
+            query.order = [];
+          }
+          query.order.push([
+            Sequelize.literal(`(case when countStar=0 then 0  else (totalStar/countStar) end)`),
+            order,
+          ]);
+          return query;
+        },
+      ];
     }
 
     // allow attributes for filter
@@ -57,6 +82,7 @@ module.exports = (database, DataTypes) => {
       allowNull: false,
       validate: {
         notNull: {
+          args: true,
           msg: 'name must be not null',
         },
         len: {
@@ -75,6 +101,7 @@ module.exports = (database, DataTypes) => {
       allowNull: false,
       validate: {
         notNull: {
+          args: true,
           msg: 'page count must be not null',
         },
         min: 1,
@@ -141,6 +168,16 @@ module.exports = (database, DataTypes) => {
     description: {
       type: Sequelize.DataTypes.TEXT,
       allowNull: true,
+    },
+    countStar: {
+      type: Sequelize.DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    totalStar: {
+      type: Sequelize.DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
     activated: {
       type: Sequelize.DataTypes.BOOLEAN,

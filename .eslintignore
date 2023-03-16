@@ -7,5 +7,4 @@
 public/*
 storage/*
 tmp/*
-database/migrations/*
 dist/*

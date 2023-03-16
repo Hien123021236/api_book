@@ -1,0 +1,2 @@
+Wellcome {{username}}
+click here to verify: {{url}}

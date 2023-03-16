@@ -43,6 +43,7 @@ module.exports = (database, DataTypes) => {
       allowNull: false,
       validate: {
         notNull: {
+          args: true,
           msg: 'name must be not null',
         },
         len: {

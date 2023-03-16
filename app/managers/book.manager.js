@@ -363,6 +363,25 @@ module.exports = {
             return callback(true, 'delete_book_fail', 400, error, null);
           });
         },
+        // remove wishs from book
+        // function(book, next) {
+        //   Wish.findAll({
+        //     where: {
+        //       id: {
+        //         [Sequelize.Op.in]: bookId?.id,
+        //       },
+        //     },
+        //   });
+        //   Wish.destroy({
+        //     where: {
+        //       bookId: book?.id,
+        //     },
+        //   }).then(function() {
+        //     next(null, book);
+        //   }).catch(function(error) {
+        //     return callback(true, 'query_fail', 400, error, null);
+        //   });
+        // },
       ], function(error, result) {
         if (error) {
           return callback(true, 'delete_book_fail', 400, error, null);

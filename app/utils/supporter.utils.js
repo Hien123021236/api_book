@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 const fsExtra = require('fs-extra');
 
 const validator = require('validator');
@@ -137,166 +137,172 @@ const saveJsonFile = function(filePath, data) {
   fsExtra.writeFileSync(filePath, txtData);
 };
 
-const pasteFilterQuery = function (model, query, filters) { 
-  if(!query){
-    query = {}
+const pasteFilterQuery = function(model, query, filters) {
+  if (!query) {
+    query = {};
   }
 
-  if(!filters){
+  if (!filters) {
     filters = [];
   }
 
   const filterAttributes = model.getAttributesForFilter ? model.getAttributesForFilter() : [];
-  if(typeof filters === 'string' && validator.isJSON(filters)){
+  if (typeof filters === 'string' && validator.isJSON(filters)) {
     filters = JSON.parse(filters || null) || [];
   }
 
-  if(filters.length > 0){
-    if(!query.where){
+  if (filters.length > 0) {
+    if (!query.where) {
       query.where = {};
     }
     for (const filter of filters) {
       const key = filter.key;
       const operator = constant.FILTER_OPERATOR_ENUM[filter.operator];
       const value = filter.value;
-      
-      if (!(filterAttributes.includes(key))){
+
+      if (!(filterAttributes.includes(key))) {
         throw new Error(`[filter] invalid key '${key}'`);
       }
-      if (!operator){
+      if (!operator) {
         throw new Error(`[filter] invalid operator '${operator}'`);
       }
-      
+
       query.where[key] = {
-        [Op[operator]]: value
-      }
+        [Op[operator]]: value,
+      };
     }
   }
   return query;
-}
+};
 
-const pasteSortQuery = function (model, query, sort = '') { 
-  if(!query){
-    query = {}
+const pasteSortQuery = function(model, query, sort = '') {
+  if (!query) {
+    query = {};
   }
 
   // remove space
   sort = sort.replaceAll(' ', '');
-  // split to array
-  let sortList = sort.split(',');
 
-  const sortAttributes = model.getAttributesForSort ? model.getAttributesForSort() : [];
+  if (sort) {
+    // split to array
+    const sortList = sort.split(',');
 
-  if(sortList.length > 0){
-    query.order = [];
-    for (let sortItem of sortList) {
-      let order = 'asc';
-      if(sortItem.startsWith('-')){
-        order = 'desc';
-        sortItem = sortItem.replaceAll('-', ''); // remove order character "-"
-      }
-      else 
-      if (sortItem.startsWith('+')){
-        order = 'asc';
-        sortItem = sortItem.replaceAll('+', ''); // remove order character "+"
-      }
+    const sortAttributes = model.getAttributesForSort ? model.getAttributesForSort() : [];
 
-      if (sortItem && !(sortAttributes.includes(sortItem))){
-        throw new Error(`[sort] invalid key '${sortItem}'`);
-      }
+    if (sortList.length > 0) {
+      query.order = [];
+      for (const sortItem of sortList) {
+        let order = 'asc';
+        const sortKey = sortItem.replaceAll('-', '').replaceAll('+', '');
+        if (sortItem.startsWith('-')) {
+          order = 'desc';
+        } else
+        if (sortItem.startsWith('+')) {
+          order = 'asc';
+        }
 
-      // push order item
-      if(sortItem){
-        query.order.push([sortItem, order]);
+        const sortAttribute = sortAttributes.find((item) => item === sortKey || item.name == sortKey);
+
+        if (!sortAttribute) {
+          throw new Error(`[sort] invalid key '${sortKey}'`);
+        }
+
+        if (sortAttribute instanceof Function) {
+          sortAttribute(query, order);
+        } else
+        if (sortAttribute instanceof String) {
+          if (sortKey) {
+            query.order.push([sortKey, order]);
+          }
+        }
       }
     }
   }
 
   return query;
-}
+};
 
-const pasteSearchQuery = function (model, query, keyword, isSensitive = false) { 
-  if(keyword && keyword.trim()){
-    if(!query){
-      query = {}
+const pasteSearchQuery = function(model, query, keyword, isSensitive = false) {
+  if (keyword && keyword.trim()) {
+    if (!query) {
+      query = {};
     }
-  
-    if(!query.where){
+
+    if (!query.where) {
       query.where = {};
     }
-  
+
     // operator ilike in case insensitive
     // operator like in case sensitive
     const operator = isSensitive ? Op.like : Op.like; // iLike not supported for mysql
-  
-    const searchFields = model.getAttributesForSearch ?  model.getAttributesForSearch() : [];
+
+    const searchFields = model.getAttributesForSearch ? model.getAttributesForSearch() : [];
 
     const conditions = [];
 
     for (const searchField of searchFields) {
       conditions.push({
         [searchField]: {
-          [operator]: '%' + keyword +'%'
-        }
+          [operator]: '%' + keyword +'%',
+        },
       });
     }
     query.where[Op.or] = conditions;
   }
-  
-  return query;
-}
 
-const pastePaginationQuery = function (query, pageNumber, pageSize) { 
+  return query;
+};
+
+const pastePaginationQuery = function(query, pageNumber, pageSize) {
   pageSize = parseInt(pageSize);
   pageNumber = parseInt(pageNumber);
-  if(!query){
-    query = {}
+  if (!query) {
+    query = {};
   }
   query.limit = pageSize;
   query.offset = pageSize * (pageNumber - 1);
   return query;
-}
+};
 
-const pasteQuery = function (model, query, filter, sort, search, pageNumber, pageSize, pageCount = 5) { 
+const pasteQuery = function(model, query, filter, sort, search, pageNumber, pageSize, pageCount = 5) {
   pasteFilterQuery(model, query, filter);
   pasteSortQuery(model, query, sort);
   pasteSearchQuery(model, query, search);
   pastePaginationQuery(query, pageNumber, pageSize, pageCount);
   return query;
-}
+};
 
-const paginationResult = function (results, page, limit, pageCount = 5) { 
+const paginationResult = function(results, page, limit, pageCount = 5) {
   limit = parseInt(limit);
   page = parseInt(page);
 
-  if(Array.isArray(results)){
+  if (Array.isArray(results)) {
     results = {
       count: results.length,
-      rows: results.splice(limit * (page - 1), limit)
-    }
-  }
-  else
-  if(!results){
+      rows: results.splice(limit * (page - 1), limit),
+    };
+  } else
+  if (!results) {
     results = {
       count: 0,
-      rows: []
-    }
+      rows: [],
+    };
   }
 
-  let items = results.rows;
-  let pagination = {
-    prev: null, 
-    current: page, 
-    next: null, 
+  const items = results.rows;
+  const pagination = {
+    prev: null,
+    current: page,
+    next: null,
     pages: [],
-    total: Math.ceil(results.count/limit)
+    total: Math.ceil(results.count/limit),
   };
-  
+
   pagination.prev = (pagination.current - 1 >= 1) ? (pagination.current - 1) : 1;
   pagination.next = (pagination.current + 1 <= pagination.total) ? (pagination.current + 1) : pagination.total;
-  
-  let fromPage, toPage;
-  if(pagination.current <= pagination.total - Math.floor(pageCount/2)){
+
+  let fromPage; let toPage;
+  if (pagination.current <= pagination.total - Math.floor(pageCount/2)) {
     fromPage = pagination.current - Math.floor(pageCount/2);
     fromPage = (fromPage >= 1) ? fromPage : 1;
     toPage = fromPage + pageCount - 1;
@@ -307,16 +313,16 @@ const paginationResult = function (results, page, limit, pageCount = 5) {
     fromPage = toPage - pageCount + 1;
     fromPage = (fromPage >= 1) ? fromPage : 1;
   }
-  
+
   for (let i = fromPage; i <= toPage; i++) {
     pagination.pages.push(i);
   }
 
   return {
     items: items,
-    pagination: pagination
-  }
-}
+    pagination: pagination,
+  };
+};
 
 module.exports = {
   genAvatarPath,

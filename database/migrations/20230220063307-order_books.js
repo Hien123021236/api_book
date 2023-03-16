@@ -1,7 +1,7 @@
-const constant = require('./../../app/utils/constant.utils.js')
+const constant = require('./../../app/utils/constant.utils.js');
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     return queryInterface.createTable('order_books', {
       id: {
         type: Sequelize.DataTypes.BIGINT,
@@ -15,7 +15,7 @@ module.exports = {
       },
       bookId: {
         type: Sequelize.DataTypes.BIGINT,
-        allowNull: true, 
+        allowNull: true,
       },
       unitPrice: {
         type: Sequelize.DataTypes.INTEGER,
@@ -49,12 +49,12 @@ module.exports = {
       createdAt: {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.NOW,
       },
       updatedAt: {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.NOW,
       },
       deletedAt: {
         type: Sequelize.DataTypes.DATE,
@@ -63,7 +63,7 @@ module.exports = {
     });
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     return queryInterface.dropTable('order_books');
-  }
+  },
 };

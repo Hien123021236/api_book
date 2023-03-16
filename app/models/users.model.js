@@ -1,11 +1,12 @@
 // third party components
 const Sequelize = require('sequelize');
-// const validator = require('validator');
+const validator = require('validator');
 const jsonWebToken = require('jsonwebtoken');
 const bCrypt = require('bcryptjs');
 // our components
 const config = require('../configs/general.config');
 const constant = require('../utils/constant.utils');
+const pieces = require('../utils/pieces.utils');
 
 module.exports = (database, DataTypes) => {
   class User extends Sequelize.Model {
@@ -15,25 +16,29 @@ module.exports = (database, DataTypes) => {
         foreignKey: 'userId',
         as: 'orders',
       });
-      // models.User.hasMany(models.Book, {
-      //   foreignKey: 'createdBy',
-      //   as: 'books'
-      // });
+      models.User.hasMany(models.Wish, {
+        foreignKey: 'userId',
+        as: 'wishes',
+      });
+      models.User.hasMany(models.Comment, {
+        foreignKey: 'userId',
+        as: 'comments',
+      });
     }
 
     // allow attributes for search
     static getAttributesForSearch() {
-      return ['name'];
+      return ['name', 'email'];
     }
 
     // allow attributes for sort
     static getAttributesForSort() {
-      return ['name', 'ipAddress', 'activated', 'createdAt'];
+      return ['name', 'email', 'ipAddress', 'activated', 'createdAt'];
     }
 
     // allow attributes for filter
     static getAttributesForFilter() {
-      return ['name', 'ipAddress', 'activated', 'deleted', 'createdAt'];
+      return ['name', 'email', 'ipAddress', 'activated', 'deleted', 'createdAt'];
     }
 
     static signToken(user) {
@@ -50,6 +55,10 @@ module.exports = (database, DataTypes) => {
 
     static hashPassword(password) {
       return bCrypt.hashSync(password, 10);
+    }
+
+    static generateSecretKey() {
+      return pieces.genRandomString(32);
     }
 
     static comparePassword(password, hashPassword) {
@@ -103,6 +112,41 @@ module.exports = (database, DataTypes) => {
         },
       },
     },
+    verifyToken: {
+      type: Sequelize.DataTypes.STRING(255),
+      allowNull: true,
+    },
+    email: {
+      type: Sequelize.DataTypes.STRING(64),
+      allowNull: true,
+      validate: {
+        len: {
+          args: [0, 64],
+          msg: 'email must less than 64 characters',
+        },
+        isEmail: function(value, next) {
+          if (value && !validator.isEmail(value)) {
+            next(new Error('email must be email format'));
+          }
+          next();
+        },
+        isUnique: function(value, next) {
+          User.findOne({
+            where: {
+              email: value,
+            },
+          }).then(function(user) {
+            if (user) {
+              next(new Error('email duplicated'));
+            } else {
+              next();
+            }
+          }).catch(function(error) {
+            next(error);
+          });
+        },
+      },
+    },
     type: {
       type: Sequelize.DataTypes.SMALLINT,
       allowNull: true,
@@ -114,6 +158,10 @@ module.exports = (database, DataTypes) => {
           msg: `type must be in list user type (${Object.values(constant.USER_TYPE_ENUM).toString()})`,
         },
       },
+    },
+    verified: {
+      type: Sequelize.DataTypes.BOOLEAN,
+      defaultValue: constant.BOOLEAN_ENUM.FALSE,
     },
     activated: {
       type: Sequelize.DataTypes.BOOLEAN,

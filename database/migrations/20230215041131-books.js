@@ -33,6 +33,16 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(255),
         allowNull: true,
       },
+      countStar: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      totalStar: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       activated: {
         type: Sequelize.DataTypes.BOOLEAN,
         defaultValue: constant.BOOLEAN_ENUM.FALSE,

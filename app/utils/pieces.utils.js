@@ -36,7 +36,7 @@ const safelyParseJSON = function(json) {
     parsed = JSON.parse(json || null);
   } catch (e) {
     parsed = null;
-  } 
+  }
   return parsed;
 };
 

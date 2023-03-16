@@ -18,6 +18,18 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(128),
         allowNull: true,
       },
+      email: {
+        type: Sequelize.DataTypes.STRING(64),
+        allowNull: true,
+      },
+      verifyToken: {
+        type: Sequelize.DataTypes.STRING(255),
+        allowNull: true,
+      },
+      verified: {
+        type: Sequelize.DataTypes.BOOLEAN,
+        defaultValue: constant.BOOLEAN_ENUM.FALSE,
+      },
       activated: {
         type: Sequelize.DataTypes.BOOLEAN,
         defaultValue: constant.BOOLEAN_ENUM.FALSE,

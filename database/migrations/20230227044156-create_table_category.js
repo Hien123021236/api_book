@@ -1,22 +1,22 @@
-const constant = require('./../../app/utils/constant.utils.js')
+const constant = require('./../../app/utils/constant.utils.js');
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     return queryInterface.createTable('categories', {
       id: {
         type: Sequelize.DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
-    },
-    name: {
+      },
+      name: {
         type: Sequelize.DataTypes.STRING(255),
         allowNull: false,
-    },
-    description: {
+      },
+      description: {
         type: Sequelize.DataTypes.TEXT,
         allowNull: true,
-    },
+      },
       activated: {
         type: Sequelize.DataTypes.BOOLEAN,
         defaultValue: constant.BOOLEAN_ENUM.FALSE,
@@ -40,12 +40,12 @@ module.exports = {
       createdAt: {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.NOW,
       },
       updatedAt: {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.NOW,
       },
       deletedAt: {
         type: Sequelize.DataTypes.DATE,
@@ -54,7 +54,7 @@ module.exports = {
     });
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     return queryInterface.dropTable('categories');
-  }
+  },
 };
