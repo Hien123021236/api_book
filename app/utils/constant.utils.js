@@ -15,9 +15,8 @@ const STATUS_ENUM = {
 const USER_TYPE_ENUM = {
   USER: 1,
   AGENT: 2,
-  ADMIN: 3
+  ADMIN: 3,
 };
-
 
 
 const DATA_TYPE_ENUM = {
@@ -70,7 +69,7 @@ const FILTER_OPERATOR_ENUM = {
   '>=': 'gte',
   'in': 'in',
   'between': 'between',
-  'like': 'like'
+  'like': 'like',
 };
 
 const TASK_STATUS_ENUM = {
@@ -92,10 +91,10 @@ const LOGIN_METHOD_ENUM = {
 };
 
 const STORAGE_PROTOCOL_ENUM = {
-  SAN: "SAN",
-  NAS: "NAS",
-  FTP: "FTP",
-  SMTP: "SMPT",
+  SAN: 'SAN',
+  NAS: 'NAS',
+  FTP: 'FTP',
+  SMTP: 'SMPT',
 };
 
 const REPOSITORY_TYPE_ENUM = {
@@ -127,17 +126,17 @@ const MEDIA_TYPE_ENUM = {
   AUDIO: 2,
   IMAGE: 3,
   TEXT: 4,
-  ZIP: 5
+  ZIP: 5,
 };
 
 const CLOUD_PROTOCOL_ENUM = {
-  S3G: "S3G"
-}
+  S3G: 'S3G',
+};
 
 const WORKFLOW_NODE_TYPE = {
   RESPOSITORY: 1,
   ACTION: 2,
-}
+};
 
 const JOB_STATUS_ENUM = {
   PROCESSING: 'processing',
@@ -164,6 +163,22 @@ const LIBIRARY_STATUS_ENUM = {
   UNREADY: 'unready',
 };
 
+const PROMOTION_TYPE_ENUM = {
+  VALUE: 1,
+  PERCENT: 2,
+};
+
+const COUPON_TYPE_ENUM = {
+  VALUE: 1,
+  PERCENT: 2,
+};
+
+const ORDER_STATUS_ENUM={
+  ORDERED: 1,
+  CONFIRMED: 2,
+  PAIED: 3,
+};
+
 module.exports = {
   STATUS_ENUM,
   LOGIN_METHOD_ENUM,
@@ -186,5 +201,8 @@ module.exports = {
   JOB_STATUS_ENUM,
   TASK_SEND_METHOD_ENUM,
   TAPE_STATUS_ENUM,
-  LIBIRARY_STATUS_ENUM
+  LIBIRARY_STATUS_ENUM,
+  PROMOTION_TYPE_ENUM,
+  COUPON_TYPE_ENUM,
+  ORDER_STATUS_ENUM,
 };

@@ -1,5 +1,5 @@
 // const config = require('../configs/general.config');
-const orderManager = require('../managers/order.manager');
+const promotionManager = require('../managers/promotion.manager');
 const rest = require('../utils/restware.utils');
 // const constant = require('../utils/constant.utils');
 
@@ -8,7 +8,7 @@ module.exports = {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.body.accessUserType || 0;
     const data = req.body || '';
-    orderManager.create(accessUserId, accessUserType, data, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    promotionManager.create(accessUserId, accessUserType, data, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -17,10 +17,10 @@ module.exports = {
   },
 
   getOne: function(req, res) {
+    const id = req.params.id || '';
     const accessUserId = req.query.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.query.accessUserType || 0;
-    const id = req.params.id || '';
-    orderManager.getOne(accessUserId, accessUserType, id, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    promotionManager.getOne(accessUserId, accessUserType, id, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -30,13 +30,13 @@ module.exports = {
 
   getAll: function(req, res) {
     const accessUserId = req.query.accessUserId || global.INFO.anonymousId;
-    const accessUserType = req.body.accessUserType || 0;
+    const accessUserType = req.query.accessUserType || 0;
     const filter = req.query.filter || '';
     const sort = req.query.sort || '';
     const search = req.query.search || '';
     const page = req.query.page || 1;
     const limit = req.query.limit || Number.MAX_SAFE_INTEGER;
-    orderManager.getAll(accessUserId, accessUserType, filter, sort, search, page, limit, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    promotionManager.getAll(accessUserId, accessUserType, filter, sort, search, page, limit, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -48,8 +48,8 @@ module.exports = {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.body.accessUserType || 0;
     const id = req.params.id || '';
-    const data = req.body || '';
-    orderManager.update(accessUserId, accessUserType, id, data, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    const body = req.body || '';
+    promotionManager.update(accessUserId, accessUserType, id, body, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -58,10 +58,10 @@ module.exports = {
   },
 
   delete: function(req, res) {
+    const id = req.params.id || '';
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.body.accessUserType || 0;
-    const id = req.params.id || '';
-    orderManager.delete(accessUserId, accessUserType, id, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    promotionManager.delete(accessUserId, accessUserType, id, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -69,12 +69,12 @@ module.exports = {
     });
   },
 
-  applyCoupons: function(req, res) {
+  addBook: function(req, res) {
+    const id = req.params.id || '';
+    const bookId = req.body.bookId || 0;
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.body.accessUserType || 0;
-    const id = req.params.id || '';
-    const data = req.body || '';
-    orderManager.applyCoupons(accessUserId, accessUserType, id, data, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    promotionManager.addBook(accessUserId, accessUserType, id, bookId, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -82,11 +82,12 @@ module.exports = {
     });
   },
 
-  confirm: function(req, res) {
+  addBooks: function(req, res) {
+    const id = req.params.id || '';
+    const bookIds = req.body.bookIds || '';
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.body.accessUserType || 0;
-    const id = req.params.id || '';
-    orderManager.confirm(accessUserId, accessUserType, id, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    promotionManager.addBooks(accessUserId, accessUserType, id, bookIds, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -94,12 +95,42 @@ module.exports = {
     });
   },
 
-  pay: function(req, res) {
+  removeBook: function(req, res) {
+    const id = req.params.id || '';
+    const bookId = req.body.bookId || '';
+    const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
+    const accessUserType = req.body.accessUserType || 0;
+    promotionManager.removeBook(accessUserId, accessUserType, id, bookId, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+      if (errorCode) {
+        return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
+      }
+      return rest.sendSuccessOne(res, result, httpCode);
+    });
+  },
+
+  removeBooks: function(req, res) {
+    const id = req.params.id || '';
+    const bookIds = req.body.bookIds || '';
+    const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
+    const accessUserType = req.body.accessUserType || 0;
+    promotionManager.removeBooks(accessUserId, accessUserType, id, bookIds, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+      if (errorCode) {
+        return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
+      }
+      return rest.sendSuccessOne(res, result, httpCode);
+    });
+  },
+
+  getPromotionsByBook: function(req, res) {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.body.accessUserType || 0;
     const id = req.params.id || '';
-    const body = req.body || '';
-    orderManager.pay(accessUserId, accessUserType, id, body, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    const filter = req.query.filter || '';
+    const sort = req.query.sort || '';
+    const search = req.query.search || '';
+    const page = req.query.page || 1;
+    const limit = req.query.limit || Number.MAX_SAFE_INTEGER;
+    promotionManager.getPromotionsByBook(accessUserId, accessUserType, id, filter, sort, search, page, limit, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }

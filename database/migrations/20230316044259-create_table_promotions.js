@@ -2,30 +2,55 @@ const constant = require('./../../app/utils/constant.utils.js');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.createTable('orders', {
+    return queryInterface.createTable('promotions', {
       id: {
         type: Sequelize.DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-      userId: {
+      name: {
+        type: Sequelize.DataTypes.STRING(255),
+        allowNull: false,
+      },
+      startDate: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
+      endDate: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
+      discountValue: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: true,
-      },
-      totalAmount: {
-        type: Sequelize.DataTypes.INTEGER,
-        allowNull: false,
         defaultValue: 0,
       },
-      status: {
-        type: Sequelize.DataTypes.SMALLINT,
-        allowNull: false,
-        defaultValue: constant.ORDER_STATUS_ENUM.ORDERED,
+      discountPercent: {
+        type: Sequelize.DataTypes.BIGINT,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      discountMin: {
+        type: Sequelize.DataTypes.BIGINT,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      discountMax: {
+        type: Sequelize.DataTypes.BIGINT,
+        allowNull: true,
+        defaultValue: 0,
       },
       activated: {
         type: Sequelize.DataTypes.BOOLEAN,
         defaultValue: constant.BOOLEAN_ENUM.FALSE,
+      },
+      type: {
+        type: Sequelize.DataTypes.SMALLINT,
+        allowNull: false,
+        defaultValue: constant.PROMOTION_TYPE_ENUM.VALUE,
       },
       deleted: {
         type: Sequelize.DataTypes.BOOLEAN,
@@ -61,6 +86,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.dropTable('orders');
+    return queryInterface.dropTable('promotions');
   },
 };

@@ -207,10 +207,10 @@ const pasteSortQuery = function(model, query, sort = '') {
           throw new Error(`[sort] invalid key '${sortKey}'`);
         }
 
-        if (sortAttribute instanceof Function) {
+        if (typeof sortAttribute === 'function') {
           sortAttribute(query, order);
         } else
-        if (sortAttribute instanceof String) {
+        if (typeof sortAttribute === 'string') {
           if (sortKey) {
             query.order.push([sortKey, order]);
           }
@@ -253,22 +253,22 @@ const pasteSearchQuery = function(model, query, keyword, isSensitive = false) {
   return query;
 };
 
-const pastePaginationQuery = function(query, pageNumber, pageSize) {
-  pageSize = parseInt(pageSize);
-  pageNumber = parseInt(pageNumber);
+const pastePaginationQuery = function(query, page, limit) {
+  limit = parseInt(limit);
+  page = parseInt(page);
   if (!query) {
     query = {};
   }
-  query.limit = pageSize;
-  query.offset = pageSize * (pageNumber - 1);
+  query.limit = limit;
+  query.offset = limit * (page - 1);
   return query;
 };
 
-const pasteQuery = function(model, query, filter, sort, search, pageNumber, pageSize, pageCount = 5) {
+const pasteQuery = function(model, query, filter, sort, search, page, limit, pageCount = 5) {
   pasteFilterQuery(model, query, filter);
   pasteSortQuery(model, query, sort);
   pasteSearchQuery(model, query, search);
-  pastePaginationQuery(query, pageNumber, pageSize, pageCount);
+  pastePaginationQuery(query, page, limit, pageCount);
   return query;
 };
 

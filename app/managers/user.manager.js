@@ -136,23 +136,7 @@ module.exports = {
       if (accessUserType < constant.USER_TYPE_ENUM.ADMIN) {
         return callback(1, 'permission_denied', 403, 'permission denied', null);
       }
-
-      const data = {};
-      if (body.username != '' && body.username != null) {
-        data.username = body.username;
-      }
-      if (body.password != '' && body.password != null) {
-        data.password = body.password;
-      }
-      if (body.email != '' && body.email != null) {
-        data.email = body.email;
-      }
-      if (body.type != '' && body.type != null) {
-        data.type = body.type;
-      }
-
       async.waterfall([
-
         // get user
         function(next) {
           User.findOne({
@@ -170,6 +154,12 @@ module.exports = {
 
         // update user
         function(user, next) {
+          const data = {...user.dataValues};
+          for (const attr in user.get()) {
+            if (body[attr] != '' && body[attr] != null && body[attr] != undefined) {
+              data[attr] = body[attr];
+            }
+          }
           User.build(data).validate().then(function() {
             Object.assign(user, data);
             user.password = User.hashPassword(user.password);
@@ -269,7 +259,7 @@ module.exports = {
           return callback(1, 'deleted_user', 400, 'User has been deleted', null);
         }
         if (!User.comparePassword(data.password, user.password)) {
-          return callback(1, 'wrong_user', 400, 'Wrong user', null);
+          return callback(1, 'wrong_password', 400, 'wrong password', null);
         }
         if (!user.verified) {
           return callback(1, 'user_unverified', 400, 'user unverified', null);
@@ -374,6 +364,9 @@ module.exports = {
             }
             if (user.deleted) {
               return callback(1, 'deleted_user', 400, 'User has been deleted', null);
+            }
+            if (!user.verified) {
+              return callback(1, 'email_unverified', 400, 'email unverified', null);
             }
             next(null, user);
           }).catch(function(error) {

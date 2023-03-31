@@ -2,8 +2,8 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.addColumn(
-        'books',
-        'thumbnail',
+        'orders',
+        'couponIds',
         {
           type: Sequelize.DataTypes.TEXT,
           allowNull: true,
@@ -12,7 +12,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.removeColumn('books', 'thumbnail');
+    return queryInterface.removeColumn('orders', 'couponIds');
   },
 };
-

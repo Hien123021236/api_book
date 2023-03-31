@@ -6,9 +6,15 @@ const Sequelize = require('sequelize');
 const constant = require('../utils/constant.utils');
 
 module.exports = (database, DataTypes) => {
-  class Coupon extends Sequelize.Model {
+  class Promotion extends Sequelize.Model {
     // initiate associate with other models (automatically called in ../models/index.js)
     static associate(models) {
+      models.Promotion.belongsToMany(models.Book, {
+        through: 'promotion_books',
+        foreignKey: 'promotionId',
+        otherKey: 'bookId',
+        as: 'books',
+      });
     }
 
     // allow attributes for search
@@ -25,18 +31,9 @@ module.exports = (database, DataTypes) => {
     static getAttributesForFilter() {
       return ['id', 'name', 'discountValue', 'discountPercent', 'activated', 'createdAt'];
     }
-
-    static couponGenerator() {
-      let coupon = '';
-      const possible = 'abcdefghijklmnopqrstuvwxyz0123456789';
-      for (let i = 0; i < 6; i++) {
-        coupon += possible.charAt(Math.floor(Math.random() * possible.length));
-      }
-      return coupon;
-    }
   }
 
-  Coupon.init({
+  Promotion.init({
     id: {
       type: Sequelize.DataTypes.BIGINT,
       autoIncrement: true,
@@ -56,7 +53,7 @@ module.exports = (database, DataTypes) => {
           msg: 'name must be between 1 and 255 characters',
         },
         isUnique: function(value, next) {
-          Coupon.findOne({
+          Promotion.findOne({
             where: {
               id: {[Sequelize.Op.ne]: this.id},
               name: value,
@@ -144,7 +141,7 @@ module.exports = (database, DataTypes) => {
     type: {
       type: Sequelize.DataTypes.SMALLINT,
       allowNull: false,
-      defaultValue: constant.COUPON_TYPE_ENUM.VALUE,
+      defaultValue: constant.PROMOTION_TYPE_ENUM.VALUE,
       validate: {
         notNull: {
           args: true,
@@ -154,33 +151,8 @@ module.exports = (database, DataTypes) => {
           msg: 'type must be a number',
         },
         isIn: {
-          args: [Object.values(constant.COUPON_TYPE_ENUM)],
-          msg: `type must be one of (${Object.values(constant.COUPON_TYPE_ENUM).toString()})`,
-        },
-      },
-    },
-    code: {
-      type: Sequelize.DataTypes.STRING(255),
-      allowNull: true,
-      defaultValue: null,
-      validate: {
-        len: {
-          args: [1, 6],
-          msg: 'code must be between 1 and 6 characters',
-        },
-        isAlphanumeric: {
-          args: true,
-          msg: 'code must contain only alphabet letters and numbers',
-        },
-      },
-    },
-    quantity: {
-      type: Sequelize.DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: 0,
-      validate: {
-        isInt: {
-          msg: 'quantity must be a number',
+          args: [Object.values(constant.PROMOTION_TYPE_ENUM)],
+          msg: `type must be one of (${Object.values(constant.PROMOTION_TYPE_ENUM).toString()})`,
         },
       },
     },
@@ -220,12 +192,12 @@ module.exports = (database, DataTypes) => {
     },
   }, {
     sequelize: database,
-    tableName: 'coupons',
+    tableName: 'promotions',
     validate: {
       checkType(next) {
-        if (parseInt(this.type) == constant.COUPON_TYPE_ENUM.VALUE && !this.discountValue) {
+        if (parseInt(this.type) == constant.PROMOTION_TYPE_ENUM.VALUE && !this.discountValue) {
           next(new Error('discount value must be not null'));
-        } else if (parseInt(this.type) == constant.COUPON_TYPE_ENUM.PERCENT && !this.discountPercent) {
+        } else if (parseInt(this.type) == constant.PROMOTION_TYPE_ENUM.PERCENT && !this.discountPercent) {
           next(new Error('discount percent must be not null'));
         }
         next();
@@ -233,5 +205,5 @@ module.exports = (database, DataTypes) => {
     },
   });
 
-  return Coupon;
+  return Promotion;
 };

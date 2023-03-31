@@ -13,6 +13,12 @@ module.exports = (database, DataTypes) => {
         foreignKey: 'orderId',
         as: 'orderBooks',
       });
+
+      models.Order.belongsToMany(models.Book, {
+        foreignKey: 'orderId',
+        through: models.OrderBook,
+        as: 'books',
+      });
     }
 
     // allow attributes for search
@@ -46,6 +52,28 @@ module.exports = (database, DataTypes) => {
       type: Sequelize.DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+    },
+    couponIds: {
+      type: Sequelize.DataTypes.TEXT,
+      allowNull: true,
+    },
+    status: {
+      type: Sequelize.DataTypes.SMALLINT,
+      allowNull: false,
+      defaultValue: constant.ORDER_STATUS_ENUM.ORDERED,
+      validate: {
+        notNull: {
+          args: true,
+          msg: 'status must be not null',
+        },
+        isInt: {
+          msg: 'status must be a number',
+        },
+        isIn: {
+          args: [Object.values(constant.ORDER_STATUS_ENUM)],
+          msg: `status must be one of (${Object.values(constant.ORDER_STATUS_ENUM).toString()})`,
+        },
+      },
     },
     activated: {
       type: Sequelize.DataTypes.BOOLEAN,

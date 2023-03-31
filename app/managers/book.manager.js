@@ -3,11 +3,32 @@ const async = require('async');
 const moment = require('moment-timezone');
 
 // const config = require('../configs/general.config');
-const {Book, Category, CategoryBook, database} = require('../models/index');
+const {Book, Promotion, Category, CategoryBook, database} = require('../models/index');
 const constant = require('../utils/constant.utils');
 const supporter = require('../utils/supporter.utils');
 const UploadService = require('../services/upload.service');
 
+
+function calcNewPrice(price, promotion) {
+  if (!promotion) {
+    return price;
+  }
+  let discountPrice = 0;
+  if (promotion.type == constant.PROMOTION_TYPE_ENUM.PERCENT) {
+    discountPrice = parseInt(price) * (parseInt(promotion.discountPercent)) / 100;
+  } else
+  if (promotion.type == constant.PROMOTION_TYPE_ENUM.VALUE) {
+    discountPrice = parseInt(promotion.discountValue);
+  }
+
+  if (promotion.discountMin && discountPrice < promotion.discountMin) {
+    discountPrice = parseInt(promotion.discountMin);
+  }
+  if (promotion.discountMax && discountPrice > promotion.discountMax) {
+    discountPrice = parseInt(promotion.discountMax);
+  }
+  return price - discountPrice;
+}
 
 module.exports = {
 
@@ -120,6 +141,28 @@ module.exports = {
         include: [
           {model: Category, as: 'categories'},
         ],
+        include: [
+          {
+            model: Promotion,
+            as: 'promotions',
+            where: {
+              deleted: constant.BOOLEAN_ENUM.FALSE,
+              [Sequelize.Op.or]: [
+                {startDate: null},
+                {startDate: {
+                  [Sequelize.Op.lte]: moment().format(),
+                }},
+              ],
+              [Sequelize.Op.or]: [
+                {startDate: null},
+                {endDate: {
+                  [Sequelize.Op.gte]: moment().format(),
+                }},
+              ],
+            },
+            required: false,
+          },
+        ],
       }).then(function(book) {
         if (!book) {
           return callback(1, 'wrong_book,', 400, 'wrong book', null);
@@ -127,6 +170,8 @@ module.exports = {
         if (book.deleted) {
           return callback(1, 'book_deleted,', 403, 'book has been deleted', null);
         }
+        const promotion = book.promotions[0];
+        book.dataValues.newPrice = calcNewPrice(book.price, promotion);
         return callback(null, null, 200, null, book);
       }).catch(function(error) {
         return callback(1, 'query_fail', 400, error, null);
@@ -136,17 +181,46 @@ module.exports = {
     }
   },
 
-  getAllNonAuth: function(accessUserId, accessUserType, filter, sort, search, page, limit, callback) {
+  getAllWithoutAuth: function(accessUserId, accessUserType, filter, sort, search, page, limit, callback) {
     try {
       const query ={
         where: {
           deleted: constant.BOOLEAN_ENUM.FALSE,
         },
+        include: [
+          {
+            model: Promotion,
+            as: 'promotions',
+            where: {
+              deleted: constant.BOOLEAN_ENUM.FALSE,
+              [Sequelize.Op.or]: [
+                {startDate: null},
+                {startDate: {
+                  [Sequelize.Op.lte]: moment().format(),
+                }},
+              ],
+              [Sequelize.Op.or]: [
+                {startDate: null},
+                {endDate: {
+                  [Sequelize.Op.gte]: moment().format(),
+                }},
+              ],
+            },
+            required: false,
+          },
+        ],
       };
 
       supporter.pasteQuery(Book, query, filter, sort, search, page, limit);
 
-      Book.findAndCountAll(query).then(function(result) {
+      Book.findAndCountAll({
+        ...query,
+        // logging: console.log,
+      }).then(function(result) {
+        result.rows = result.rows.map((book)=>{
+          book.dataValues.newPrice = calcNewPrice(book.price, book.promotions[0]);
+          return book;
+        });
         const paginationResult = supporter.paginationResult(result, page, limit);
         return callback(null, null, 200, null, paginationResult);
       }).catch(function(error) {
@@ -157,7 +231,7 @@ module.exports = {
     }
   },
 
-  getAllAuth: function(accessUserId, accessUserType, filter, sort, search, page, limit, callback) {
+  getAllWithAuth: function(accessUserId, accessUserType, filter, sort, search, page, limit, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.AGENT) {
         return callback(1, 'permission_denied', 403, 'permission denied', null);
@@ -167,6 +241,28 @@ module.exports = {
         where: {
           deleted: constant.BOOLEAN_ENUM.FALSE,
         },
+        include: [
+          {
+            model: Promotion,
+            as: 'promotions',
+            where: {
+              deleted: constant.BOOLEAN_ENUM.FALSE,
+              [Sequelize.Op.or]: [
+                {startDate: null},
+                {startDate: {
+                  [Sequelize.Op.lte]: moment().format(),
+                }},
+              ],
+              [Sequelize.Op.or]: [
+                {startDate: null},
+                {endDate: {
+                  [Sequelize.Op.gte]: moment().format(),
+                }},
+              ],
+            },
+            required: false,
+          },
+        ],
       };
 
       // if agent the show books of this agent
@@ -177,6 +273,10 @@ module.exports = {
       supporter.pasteQuery(Book, query, filter, sort, search, page, limit);
 
       Book.findAndCountAll(query).then(function(result) {
+        result.rows = result.rows.map((book)=>{
+          book.dataValues.newPrice = calcNewPrice(book.price, book.promotions[0]);
+          return book;
+        });
         const paginationResult = supporter.paginationResult(result, page, limit);
         return callback(null, null, 200, null, paginationResult);
       }).catch(function(error) {
@@ -363,25 +463,6 @@ module.exports = {
             return callback(true, 'delete_book_fail', 400, error, null);
           });
         },
-        // remove wishs from book
-        // function(book, next) {
-        //   Wish.findAll({
-        //     where: {
-        //       id: {
-        //         [Sequelize.Op.in]: bookId?.id,
-        //       },
-        //     },
-        //   });
-        //   Wish.destroy({
-        //     where: {
-        //       bookId: book?.id,
-        //     },
-        //   }).then(function() {
-        //     next(null, book);
-        //   }).catch(function(error) {
-        //     return callback(true, 'query_fail', 400, error, null);
-        //   });
-        // },
       ], function(error, result) {
         if (error) {
           return callback(true, 'delete_book_fail', 400, error, null);
@@ -475,7 +556,9 @@ module.exports = {
         return callback(null, null, 200, null, book);
       });
     } catch (error) {
-
+      return callback(true, 'upload_images_fail', 400, error, null);
     }
   },
+
+  calcNewPrice,
 };

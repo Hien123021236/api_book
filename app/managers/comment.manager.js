@@ -129,7 +129,6 @@ module.exports = {
             next(null, query);
           } else
           if (accessUserType == constant.USER_TYPE_ENUM.AGENT) {
-            // where verified == true || userId == accessUserId
             Book.findAll({
               attributes: ['id'],
               where: {
@@ -150,7 +149,7 @@ module.exports = {
           supporter.pasteQuery(Comment, query, filter, sort, search, page, limit);
           Comment.findAndCountAll({
             ...query,
-            logging: console.log,
+            // logging: console.log,
           }).then(function(result) {
             const paginationResult = supporter.paginationResult(result, page, limit);
             return callback(null, null, 200, null, paginationResult);

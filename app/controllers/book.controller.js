@@ -28,7 +28,7 @@ module.exports = {
     });
   },
 
-  getAllNonAuth: function(req, res) {
+  getAllWithoutAuth: function(req, res) {
     const accessUserId = req.query.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.query.accessUserType || 0;
     const filter = req.query.filter || '';
@@ -36,7 +36,7 @@ module.exports = {
     const search = req.query.search || '';
     const page = req.query.page || 1;
     const limit = req.query.limit || Number.MAX_SAFE_INTEGER;
-    bookManager.getAllNonAuth(accessUserId, accessUserType, filter, sort, search, page, limit, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    bookManager.getAllWithoutAuth(accessUserId, accessUserType, filter, sort, search, page, limit, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }
@@ -44,7 +44,7 @@ module.exports = {
     });
   },
 
-  getAllAuth: function(req, res) {
+  getAllWithAuth: function(req, res) {
     const accessUserId = req.query.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.query.accessUserType || 0;
     const filter = req.query.filter || '';
@@ -52,7 +52,7 @@ module.exports = {
     const search = req.query.search || '';
     const page = req.query.page || 1;
     const limit = req.query.limit || Number.MAX_SAFE_INTEGER;
-    bookManager.getAllAuth(accessUserId, accessUserType, filter, sort, search, page, limit, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    bookManager.getAllWithAuth(accessUserId, accessUserType, filter, sort, search, page, limit, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }

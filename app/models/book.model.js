@@ -13,6 +13,12 @@ module.exports = (database, DataTypes) => {
         through: models.CategoryBook,
         as: 'categories',
       });
+      models.Book.belongsToMany(models.Promotion, {
+        through: 'promotion_books',
+        foreignKey: 'bookId',
+        otherKey: 'promotionId',
+        as: 'promotions',
+      });
       models.Book.hasMany(models.Wish, {
         foreignKey: 'bookId',
         as: 'wishes',
@@ -104,8 +110,6 @@ module.exports = (database, DataTypes) => {
           args: true,
           msg: 'page count must be not null',
         },
-        min: 1,
-        max: 10000,
       },
     },
     authors: {

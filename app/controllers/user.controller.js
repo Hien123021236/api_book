@@ -66,8 +66,8 @@ module.exports = {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType = req.body.accessUserType || 0;
     const id = req.params.id || '';
-    const data = req.body || '';
-    userManager.update(accessUserId, accessUserType, id, data, function(errorCode, errorMessage, httpCode, errorDescription, result) {
+    const body = req.body || '';
+    userManager.update(accessUserId, accessUserType, id, body, function(errorCode, errorMessage, httpCode, errorDescription, result) {
       if (errorCode) {
         return rest.sendError(res, errorCode, errorMessage, httpCode, errorDescription);
       }

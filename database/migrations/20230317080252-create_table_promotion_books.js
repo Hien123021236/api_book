@@ -2,30 +2,20 @@ const constant = require('./../../app/utils/constant.utils.js');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.createTable('orders', {
+    return queryInterface.createTable('promotion_books', {
       id: {
         type: Sequelize.DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-      userId: {
+      bookId: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: true,
       },
-      totalAmount: {
-        type: Sequelize.DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      status: {
-        type: Sequelize.DataTypes.SMALLINT,
-        allowNull: false,
-        defaultValue: constant.ORDER_STATUS_ENUM.ORDERED,
-      },
-      activated: {
-        type: Sequelize.DataTypes.BOOLEAN,
-        defaultValue: constant.BOOLEAN_ENUM.FALSE,
+      promotionId: {
+        type: Sequelize.DataTypes.BIGINT,
+        allowNull: true,
       },
       deleted: {
         type: Sequelize.DataTypes.BOOLEAN,
@@ -61,6 +51,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.dropTable('orders');
+    return queryInterface.dropTable('promotion_books');
   },
 };
